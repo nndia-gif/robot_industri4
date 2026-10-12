@@ -45,7 +45,6 @@ class PoseEstimator(Node):
             omega = self.omega
 
         # --- HITUNG KECEPATAN GLOBAL DI SINI ---
-        # Kecepatan lokal (v) diproyeksikan ke sumbu X dan Y dunia
         v_x_global = v * math.cos(self.theta)
         v_y_global = v * math.sin(self.theta)
 

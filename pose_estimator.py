@@ -34,7 +34,6 @@ class PoseEstimator(Node):
         
         dt = (now - self.last_update).nanoseconds / 1e9
         self.last_update = now
-
         dt = min(dt, 0.1)
 
         time_since_cmd = (now - self.last_command_time).nanoseconds / 1e9
@@ -45,9 +44,15 @@ class PoseEstimator(Node):
             v = self.v
             omega = self.omega
 
+        # --- HITUNG KECEPATAN GLOBAL DI SINI ---
+        # Kecepatan lokal (v) diproyeksikan ke sumbu X dan Y dunia
+        v_x_global = v * math.cos(self.theta)
+        v_y_global = v * math.sin(self.theta)
+
+        # Integrasi gerak robot (Posisi)
         if abs(omega) < 1e-9:
-            self.x += v * math.cos(self.theta) * dt
-            self.y += v * math.sin(self.theta) * dt
+            self.x += v_x_global * dt
+            self.y += v_y_global * dt
         else:
             delta_theta = omega * dt
             self.x += (v / omega) * (math.sin(self.theta + delta_theta) - math.sin(self.theta))
@@ -57,11 +62,12 @@ class PoseEstimator(Node):
         time_since_print = (now - self.last_print_time).nanoseconds / 1e9
         if time_since_print >= 0.5:
             yaw_deg = math.degrees(self.theta)
-            # Modulo 360 agar sudut 360 derajat terbaca sebagai 0.0
             yaw_deg = yaw_deg % 360.0 
             
+            # --- TAMPILKAN KECEPATAN GLOBAL DI TERMINAL ---
             self.get_logger().info(
-                f'ESTIMASI | X = {self.x:.2f} m | Y = {self.y:.2f} m | Yaw = {yaw_deg:.1f} deg | v = {v:.2f} m/s | omega = {omega:.2f} rad/s'
+                f'Posisi: [X={self.x:.2f}m, Y={self.y:.2f}m, Yaw={yaw_deg:.1f}°] | '
+                f'Kecepatan Global: [Vx={v_x_global:.2f}m/s, Vy={v_y_global:.2f}m/s]'
             )
             self.last_print_time = now
 

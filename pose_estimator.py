@@ -16,7 +16,6 @@ class PoseEstimator(Node):
         self.y = 0.0
         self.theta = 0.0
 
-        # Gunakan ROS Clock
         self.last_update = self.get_clock().now()
         self.last_command_time = self.get_clock().now()
         self.last_print_time = self.get_clock().now()
@@ -33,7 +32,6 @@ class PoseEstimator(Node):
     def update_pose(self):
         now = self.get_clock().now()
         
-        # Hitung dt dalam detik
         dt = (now - self.last_update).nanoseconds / 1e9
         self.last_update = now
 

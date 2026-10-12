@@ -10,17 +10,14 @@ class MoverNode(Node):
         self.publisher_ = self.create_publisher(Twist, 'cmd_vel', 10)
         self.timer = self.create_timer(0.1, self.timer_callback)
         
-        # JANGAN set waktu di sini. Kosongkan dulu sampai Gazebo merespon.
         self.start_time = None
 
     def timer_callback(self):
         current_time = self.get_clock().now()
 
-        # Cegah program berjalan jika waktu Gazebo masih 0
         if current_time.nanoseconds == 0:
             return
-
-        # Set start_time HANYA pada detik pertama Gazebo merespon
+            
         if self.start_time is None:
             self.start_time = current_time
             self.get_logger().info('Menunggu 2 detik agar koneksi ROS 2 stabil...')
@@ -28,19 +25,16 @@ class MoverNode(Node):
         msg = Twist()
         elapsed_time = (current_time - self.start_time).nanoseconds / 1e9
 
-        # --- TAMBAHAN: Waktu Tunggu (Delay) ---
-        t0 = 2.0                          # Diam 2 detik pertama
+        t0 = 2.0                          
         
-        # Hitung rentang waktu dengan presisi Pi, dimulai SETELAH t0
-        t1 = t0 + 5.0                     # Maju 1 (2.5 meter)
-        t2 = t1 + math.pi                 # Belok 1 (90 derajat)
-        t3 = t2 + 3.0                     # Maju 2 (1.5 meter)
-        t4 = t3 + math.pi                 # Belok 2 (90 derajat)
-        t5 = t4 + 5.0                     # Maju 3 (2.5 meter)
-        t6 = t5 + math.pi                 # Belok 3 (90 derajat)
-        t7 = t6 + 3.0                     # Maju 4 (1.5 meter)
-        t8 = t7 + math.pi                 # Belok 4 (Kembali menghadap 0 derajat)
-
+        t1 = t0 + 5.0                     
+        t2 = t1 + math.pi                 
+        t3 = t2 + 3.0                     
+        t4 = t3 + math.pi                 
+        t5 = t4 + 5.0                     
+        t6 = t5 + math.pi                 
+        t7 = t6 + 3.0                     
+        t8 = t7 + math.pi                 
         if elapsed_time < t0:
             msg.linear.x = 0.0
             msg.angular.z = 0.0
